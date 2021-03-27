@@ -11,6 +11,7 @@ struct NewRestaurant: View {
     
     @Environment(\.presentationMode) var presentation
     @ObservedObject var restData = RestaurantDataStore.shared
+    @State private var isEmpty = false
    let restaurantPlaceholder: String = "Enter the restaurant name"
     let typePlaceholder: String = "Enter the restaurant type"
     let addressPlaceholder: String = "Enter the restaurant address"
@@ -68,11 +69,13 @@ struct NewRestaurant: View {
                     HStack {
                         Spacer()
                         Button(action: {
-                                print("Form Submitted")
+                            if restaurantName == "" || restaurantType == "" || restaurantPhone == "" || restaurantAddress == "" || description == ""{
+                                isEmpty = true
+                                return
+                            }
                             let lastEle = restData.dummyRestaurants.endIndex
                             let newRest = RestaurantModel(id: restData.dummyRestaurants[lastEle-1].id + 1, name: restaurantName, type: restaurantType, address: restaurantAddress, phone: restaurantPhone, description: description,imageName: "default")
                            restData.dummyRestaurants.append(newRest)
-                            //RestaurantModel.dummyRestaurants.append(newRest)
                             self.presentation.wrappedValue.dismiss()
                             
                             }, label: {
@@ -80,6 +83,8 @@ struct NewRestaurant: View {
                                     .padding()
                                     .background(Color.red)
                                     .foregroundColor(Color.white).cornerRadius(16)
+                            }).alert(isPresented: $isEmpty, content: {
+                                Alert(title: Text("Alert"), message: Text("Fields cannot be empty"), dismissButton: .cancel())
                             })
                         Spacer()
                     }
