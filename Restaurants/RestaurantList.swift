@@ -11,6 +11,8 @@ struct RestaurantList: View {
     @ObservedObject var restData = RestaurantDataStore.shared
     @State private var selectedItemId: UUID?
     @State private var searchText = ""
+    @State private var editMode = EditMode.inactive
+
     var body: some View {
         NavigationView{
             List{
@@ -22,18 +24,34 @@ struct RestaurantList: View {
                     
                     CardView(rest: restaurant)
                     
-                }.navigationBarItems(
-                    trailing: NavigationLink(
-                                                                                                            destination: NewRestaurant(restData: restData),
-                                                                                                                                label: {
-                                                                                                                                    Label("Add", systemImage: "plus.app.fill")
-                                                                                                                                }))
+                }
+                .onDelete(perform: delete)
+                
                     
-            }.navigationTitle("Restaurants")
+            }
+            .navigationBarItems(leading: EditButton(),trailing: addButton)
+            .navigationTitle("Restaurants")
+            .environment(\.editMode, $editMode)
+            
         }
-        
     }
+    func delete(at offsets: IndexSet) {
+        restData.dummyRestaurants.remove(atOffsets: offsets)
+        }
+    private var addButton: some View {
+            switch editMode {
+            case .inactive:
+                return AnyView((NavigationLink(
+                                destination: NewRestaurant(restData: restData),
+                                label: {
+                                    Label("Add", systemImage: "plus.app.fill")
+                                })))
+            default:
+                return AnyView(EmptyView())
+            }
+        }
 }
+
 
 struct RestaurantList_Previews: PreviewProvider {
     static var previews: some View {
@@ -43,3 +61,5 @@ struct RestaurantList_Previews: PreviewProvider {
     }
         
 }
+
+

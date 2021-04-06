@@ -25,7 +25,15 @@ struct CardView: View {
                     Text("\(rest.type)").font(.title3)
                 }
                 Spacer()
-                Label("\(rest.phone)", systemImage: "phone.fill")
+                Button {
+                    let telephone = "tel://"
+                    let formattedString = telephone + rest.phone
+                    guard let url = URL(string: formattedString) else { return }
+                        UIApplication.shared.open(url)
+                } label: {
+                    Label("\(rest.phone)", systemImage: "phone.fill")
+                }.buttonStyle(BorderlessButtonStyle())
+
             }.padding()
             Text("\(rest.description)").font(.body)
             Divider()
