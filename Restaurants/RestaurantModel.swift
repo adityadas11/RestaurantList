@@ -23,14 +23,14 @@ final class RestaurantDataStore: ObservableObject{
     static let shared = RestaurantDataStore()
     @Published  var dummyRestaurants : [RestaurantModel] =
       [
-        .init(id: 1, name: "Gus's Pizza", type: "Italian", address: "829 S Rural Rd, Tempe, AZ 85281", phone: "4809902234", description:
+        .init(id: 1, name: "Gus's Pizza", type: "Italian", address: "829 S Rural Rd, Tempe, AZ 85281", phone: "4808293995", description:
                 "Specializes in New York style pizza", imageName: "pizza"),
           
-        .init(id: 2, name: "Haji Babaa", type: "Mediterranean", address: "Apache Blvd", phone: "4809902235", description: "Known for its Shawarma and Gyro",imageName: "chicken"),
+        .init(id: 2, name: "Haji Babaa", type: "Mediterranean", address: "1513 E Apache Blvd, Tempe, AZ 85281", phone: "4808941905", description: "Known for its Shawarma and Gyro",imageName: "chicken"),
           
-        .init(id: 3, name: "Chutneys", type: "Indian", address: "Baseline road", phone: "4809902236", description: " Has the best weekend buffets and Biryanis",imageName: "rice"),
+        .init(id: 3, name: "Chutneys", type: "Indian", address: "1801 E Baseline Rd STE 104, Tempe, AZ 85283", phone: "4807302555", description: " Has the best weekend buffets and Biryanis",imageName: "rice"),
           
-        .init(id: 4, name: "Popeyes", type: "American", address: "Broadway road", phone: "4809902237", description: "Known for the chicken sandwich combos",imageName: "burger")
+        .init(id: 4, name: "Popeyes", type: "American", address: "457 W Broadway Rd, Tempe, AZ 85282", phone: "4802370896", description: "Known for the chicken sandwich combos",imageName: "burger")
       
       ]
 }

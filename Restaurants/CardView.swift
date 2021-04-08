@@ -46,6 +46,5 @@ struct CardView_Previews: PreviewProvider {
     static var rest = RestaurantDataStore.shared.dummyRestaurants[0]
     static var previews: some View {
         CardView(rest: rest)
-//            .previewLayout(.fixed(width: 400, height: 60))
     }
 }

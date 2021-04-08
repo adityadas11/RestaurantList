@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct NewRestaurant: View {
     
@@ -55,6 +56,8 @@ struct NewRestaurant: View {
                                         Text("PHONE").font(.headline)
                                         TextField("Enter restaurant phone", text: $restaurantPhone)
                                                     .padding(.all)
+                                            .keyboardType(.numberPad)
+                                            .onReceive(Just(self.restaurantPhone), perform: self.numericValidator)
                                             .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0)).cornerRadius(10)
                 
                                         Text("DESCRIPTION").font(.headline)
@@ -97,6 +100,14 @@ struct NewRestaurant: View {
                                 .navigationTitle("New Restaurant")
         }.background(Color.clear)
             }
+    func numericValidator(newValue: String) {
+        if newValue.range(of: "^\\d+$", options: .regularExpression) != nil {
+            self.restaurantPhone = newValue
+        } else if !self.restaurantPhone.isEmpty {
+            self.restaurantPhone = String(newValue.prefix(self.restaurantPhone.count - 1))
+        }
+    }
+  
 }
             
 

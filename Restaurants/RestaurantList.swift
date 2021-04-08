@@ -12,21 +12,25 @@ struct RestaurantList: View {
     @State private var selectedItemId: UUID?
     @State private var searchText = ""
     @State private var editMode = EditMode.inactive
-
+   
+    
     var body: some View {
         NavigationView{
             List{
-                SearchBar(text: $searchText)
-                    .padding(.top,10)
+                    
+                    HStack{
+                        SearchBar(text: $searchText)
+                    }.padding(.top,10)
+                
+                
                 ForEach(restData.dummyRestaurants
-                        .filter({ searchText.isEmpty ? true : $0.name.contains(searchText) })
+                            .filter({ if searchText.isEmpty{return true} else{ return $0.name.contains(searchText) || $0.type.contains(searchText) }})
                 ){restaurant in
                     
                     CardView(rest: restaurant)
                     
                 }
                 .onDelete(perform: delete)
-                
                     
             }
             .navigationBarItems(leading: EditButton(),trailing: addButton)
@@ -34,7 +38,9 @@ struct RestaurantList: View {
             .environment(\.editMode, $editMode)
             
         }
+        
     }
+    
     func delete(at offsets: IndexSet) {
         restData.dummyRestaurants.remove(atOffsets: offsets)
         }
@@ -50,7 +56,10 @@ struct RestaurantList: View {
                 return AnyView(EmptyView())
             }
         }
+
+    
 }
+
 
 
 struct RestaurantList_Previews: PreviewProvider {
@@ -61,5 +70,7 @@ struct RestaurantList_Previews: PreviewProvider {
     }
         
 }
+
+
 
 
