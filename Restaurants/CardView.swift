@@ -12,7 +12,7 @@ struct CardView: View {
     var body: some View {
         
         VStack {
-            Image("\(rest.imageName)")
+            Image(uiImage: rest.imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width:150.0)

@@ -13,6 +13,11 @@ struct NewRestaurant: View {
     @Environment(\.presentationMode) var presentation
     @ObservedObject var restData = RestaurantDataStore.shared
     @State private var isEmpty = false
+    
+    @State var showActionSheet = false
+    @State var showImagePicker = false
+    @State var sourceType:UIImagePickerController.SourceType = .camera
+    
    let restaurantPlaceholder: String = "Enter the restaurant name"
     let typePlaceholder: String = "Enter the restaurant type"
     let addressPlaceholder: String = "Enter the restaurant address"
@@ -24,20 +29,66 @@ struct NewRestaurant: View {
     @State var restaurantAddress:String = ""
     @State var restaurantPhone:String = ""
     @State var description:String = ""
+    @State var restaurantImage:UIImage?
     
     
     var body: some View {
+        VStack{
+            if restaurantImage != nil{
+                Image(uiImage: restaurantImage!)
+                .resizable()
+                .scaledToFill()
+                .frame(height: 200)
+                .clipped()
+                .listRowInsets(EdgeInsets())
+            }
+            else{
+                Image(uiImage: UIImage(named: "default")!)
+                .resizable()
+                .scaledToFill()
+                .frame(height: 200)
+                .clipped()
+                .listRowInsets(EdgeInsets())
+            }
+                            
+            HStack {
+                Spacer()
+                Button(action: {
+                    self.showActionSheet = true
+                }) {
+                    Text("Choose or take a picture")
+                        .font(.subheadline)
+                }.actionSheet(isPresented: $showActionSheet){
+                    ActionSheet(title: Text("Add a picture of the restaurant"), message: nil, buttons: [
+                        //Button1
+                        
+                        .default(Text("Camera"), action: {
+                            self.showImagePicker = true
+                            self.sourceType = .camera
+                        }),
+                        //Button2
+                        .default(Text("Photo Library"), action: {
+                            self.showImagePicker = true
+                            self.sourceType = .photoLibrary
+                        }),
+                        
+                        //Button3
+                        .cancel()
+                        
+                    ])
+                }.sheet(isPresented: $showImagePicker){
+                    ImagePicker(image: self.$restaurantImage, showImagePicker: self.$showImagePicker, sourceType: self.sourceType)
+                    
+            }
+                Spacer()
+            }
+        }
         
         Form{
             Section{
                 VStack(alignment: .leading){
-                                    Image("default")
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(height: 200)
-                                    .clipped()
-                                    .listRowInsets(EdgeInsets())
-                
+                    
+                    
                                     VStack(alignment: .leading) {
                                         Text("NAME").font(.headline)
                                         TextField("Enter restaurant name", text: $restaurantName)
@@ -77,7 +128,7 @@ struct NewRestaurant: View {
                                                 return
                                             }
                                             let lastEle = restData.dummyRestaurants.endIndex
-                                            let newRest = RestaurantModel(id: restData.dummyRestaurants[lastEle-1].id + 1, name: restaurantName, type: restaurantType, address: restaurantAddress, phone: restaurantPhone, description: description,imageName: "default")
+                                            let newRest = RestaurantModel(id: restData.dummyRestaurants[lastEle-1].id + 1, name: restaurantName, type: restaurantType, address: restaurantAddress, phone: restaurantPhone, description: description,imageName: UIImage(named: "default")!)
                                            restData.dummyRestaurants.append(newRest)
                                             self.presentation.wrappedValue.dismiss()
                 
@@ -98,7 +149,8 @@ struct NewRestaurant: View {
             .padding(.bottom,10)
                                 .listRowInsets(EdgeInsets())
                                 .navigationTitle("New Restaurant")
-        }.background(Color.clear)
+        }
+        .background(Color.clear)
             }
     func numericValidator(newValue: String) {
         if newValue.range(of: "^\\d+$", options: .regularExpression) != nil {
