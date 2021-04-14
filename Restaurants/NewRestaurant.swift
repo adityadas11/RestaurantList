@@ -13,6 +13,7 @@ struct NewRestaurant: View {
     @Environment(\.presentationMode) var presentation
     @ObservedObject var restData = RestaurantDataStore.shared
     @State private var isEmpty = false
+    @Environment(\.managedObjectContext) private var viewContext
     
     @State var showActionSheet = false
     @State var showImagePicker = false
@@ -127,9 +128,8 @@ struct NewRestaurant: View {
                                                 isEmpty = true
                                                 return
                                             }
-                                            let lastEle = restData.dummyRestaurants.endIndex
-                                            let newRest = RestaurantModel(id: restData.dummyRestaurants[lastEle-1].id + 1, name: restaurantName, type: restaurantType, address: restaurantAddress, phone: restaurantPhone, description: description,imageName: UIImage(named: "default")!)
-                                           restData.dummyRestaurants.append(newRest)
+
+                                            addRestaurant()
                                             self.presentation.wrappedValue.dismiss()
                 
                                             }, label: {
@@ -157,6 +157,30 @@ struct NewRestaurant: View {
             self.restaurantPhone = newValue
         } else if !self.restaurantPhone.isEmpty {
             self.restaurantPhone = String(newValue.prefix(self.restaurantPhone.count - 1))
+        }
+    }
+    
+    func addRestaurant(){
+        let newRestaurant = Restaurant(context: viewContext)
+        newRestaurant.id = UUID()
+        newRestaurant.name = restaurantName
+        newRestaurant.type = restaurantType
+        newRestaurant.address = restaurantAddress
+        newRestaurant.phone = restaurantPhone
+        newRestaurant.detail = description
+        newRestaurant.image = restaurantImage?.jpegData(compressionQuality: 1.0) ?? UIImage(named: "default")?.jpegData(compressionQuality: 1.0)
+        saveContext()
+    }
+    
+   
+    
+    private func saveContext(){
+        do{
+            try viewContext.save()
+        }
+        catch{
+            let error = error as NSError
+            fatalError("Unresolved error: \(error)")
         }
     }
   

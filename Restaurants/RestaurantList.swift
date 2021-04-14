@@ -12,6 +12,9 @@ struct RestaurantList: View {
     @State private var selectedItemId: UUID?
     @State private var searchText = ""
     @State private var editMode = EditMode.inactive
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(entity: Restaurant.entity(), sortDescriptors: []) var restaurantList: FetchedResults<Restaurant>
    
     
     var body: some View {
@@ -23,8 +26,8 @@ struct RestaurantList: View {
                     }.padding(.top,10)
                 
                 
-                ForEach(restData.dummyRestaurants
-                            .filter({ if searchText.isEmpty{return true} else{ return $0.name.contains(searchText) || $0.type.contains(searchText) }})
+                ForEach(restaurantList
+                            .filter({ if searchText.isEmpty{return true} else{ return $0.name!.contains(searchText) || $0.type!.contains(searchText) }}), id: \.id
                 ){restaurant in
                     
                     CardView(rest: restaurant)
@@ -42,7 +45,14 @@ struct RestaurantList: View {
     }
     
     func delete(at offsets: IndexSet) {
-        restData.dummyRestaurants.remove(atOffsets: offsets)
+        offsets.map{restaurantList[$0] }.forEach(viewContext.delete)
+        do{
+            try viewContext.save()
+        }
+        catch{
+            let error = error as NSError
+            fatalError("Unresolved error: \(error)")
+        }
         }
     private var addButton: some View {
             switch editMode {

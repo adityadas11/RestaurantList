@@ -9,10 +9,11 @@ import SwiftUI
 
 @main
 struct RestaurantsApp: App {
+    let persistenceContainer = PersistenceController.shared
     var restaurantData = RestaurantDataStore().self
     var body: some Scene {
         WindowGroup {
-            RestaurantList()
+            RestaurantList().environment(\.managedObjectContext, persistenceContainer.container.viewContext)
         }
     }
 }
