@@ -128,7 +128,6 @@ struct NewRestaurant: View {
                                                 isEmpty = true
                                                 return
                                             }
-
                                             addRestaurant()
                                             self.presentation.wrappedValue.dismiss()
                 
@@ -137,7 +136,10 @@ struct NewRestaurant: View {
                                                     .padding()
                                                     .background(Color.red)
                                                     .foregroundColor(Color.white).cornerRadius(16)
-                                            }).alert(isPresented: $isEmpty, content: {
+                                            })
+                                        .buttonStyle(BorderlessButtonStyle())
+                                        
+                                        .alert(isPresented: $isEmpty, content: {
                                                 Alert(title: Text("Alert"), message: Text("Fields cannot be empty"), dismissButton: .cancel())
                                             })
                                         Spacer()
