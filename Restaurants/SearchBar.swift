@@ -9,10 +9,9 @@ import SwiftUI
 
 struct SearchBar: View {
     @Binding var text : String
-    @State private var isEditing = false
     var body: some View {
         HStack{
-            TextField("Search ... ", text: $text)
+            TextField("Restaurants, cuisines", text: $text)
                 .padding(7)
                 .padding(.horizontal,25)
                 .background(Color(.systemGray6))
@@ -22,7 +21,7 @@ struct SearchBar: View {
                         .foregroundColor(.gray)
                         .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,  alignment: .leading)
                         .padding(.leading,8)
-                    if isEditing{
+                    if !text.isEmpty{
                         Button(action: {
                             self.text = ""
                         }, label: {
@@ -31,24 +30,9 @@ struct SearchBar: View {
                                 .padding(.trailing,8)
                         })
                     }
+                    
                 })
                 .padding(.horizontal, 10)
-                .onTapGesture {
-                    self.isEditing = true
-                }
-            if isEditing{
-                Button {
-                    self.isEditing = false
-                    self.text = ""
-                } label: {
-                    Text("Cancel")
-                    
-                }.padding(.trailing,10)
-                .transition(.move(edge: .trailing))
-                .animation(.default)
-                .foregroundColor(Color.blue)
-
-            }
         }
         
     }
