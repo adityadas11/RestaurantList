@@ -1,91 +1,105 @@
 //
-//  ContentView.swift
+//  SingleRestaurantView.swift
 //  Restaurants
 //
-//  Created by Aditya Das on 3/17/21.
+//  Created by Aditya Das on 4/21/21.
 //
 
 import SwiftUI
 import Combine
 
-struct NewRestaurant: View {
-    
-    @Environment(\.presentationMode) var presentation
-    @ObservedObject var restData = RestaurantDataStore.shared
+
+
+struct SingleRestaurantView: View {
     @State private var isEmpty = false
     @Environment(\.managedObjectContext) private var viewContext
-    
-    
+    @Environment(\.presentationMode) var presentation
+    @ObservedObject var restData = RestaurantDataStore.shared
     @State var showActionSheet = false
     @State var showImagePicker = false
     @State var sourceType:UIImagePickerController.SourceType = .camera
     
-   let restaurantPlaceholder: String = "Enter the restaurant name"
-    let typePlaceholder: String = "Enter the restaurant type"
-    let addressPlaceholder: String = "Enter the restaurant address"
-    let phonePlaceholder: String = "Enter the restaurant phone"
-    let descriptionPlaceholder: String = "Enter the restaurant description"
+  
     
+    
+     let restaurantPlaceholder: String = "Enter the restaurant name"
+     let typePlaceholder: String = "Enter the restaurant type"
+     let addressPlaceholder: String = "Enter the restaurant address"
+     let phonePlaceholder: String = "Enter the restaurant phone"
+     let descriptionPlaceholder: String = "Enter the restaurant description"
+     
+    @State var restaurantID: UUID
     @State var restaurantName:String = ""
-    @State var restaurantType:String = ""
-    @State var restaurantAddress:String = ""
-    @State var restaurantPhone:String = ""
-    @State var description:String = ""
-    @State var restaurantImage:UIImage?
+     @State var restaurantType:String = ""
+     @State var restaurantAddress:String = ""
+     @State var restaurantPhone:String = ""
+     @State var description:String = ""
+     @State var restaurantImage:UIImage?
+
+    init(restObj: FetchedResults<Restaurant>.Element) {
+        self.fetchedRest = restObj
+        _restaurantID =  State(wrappedValue: restObj.id!)
+        _restaurantName = State(wrappedValue: restObj.name!)
+        _restaurantType = State(wrappedValue: restObj.type!)
+        _restaurantAddress = State(wrappedValue: restObj.address!)
+        _restaurantPhone = State(wrappedValue: restObj.phone!)
+        _description = State(wrappedValue: restObj.detail!)
+        _restaurantImage = State(wrappedValue: UIImage(data: restObj.image!))
+    }
     
+    var fetchedRest: FetchedResults<Restaurant>.Element
     
     var body: some View {
-        VStack{
+        VStack {
             if restaurantImage != nil{
                 Image(uiImage: restaurantImage!)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 200)
-                .clipped()
-                .listRowInsets(EdgeInsets())
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width:250.0)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.gray, lineWidth: 5))
             }
             else{
                 Image(uiImage: UIImage(named: "default")!)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 200)
-                .clipped()
-                .listRowInsets(EdgeInsets())
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width:250.0)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.gray, lineWidth: 5))
             }
-                            
-            HStack {
-                Spacer()
-                Button(action: {
-                    self.showActionSheet = true
-                }) {
-                    Text("Choose or take a picture")
-                        .font(.subheadline)
-                }.actionSheet(isPresented: $showActionSheet){
-                    ActionSheet(title: Text("Add a picture of the restaurant"), message: nil, buttons: [
-                        //Button1
-                        
-                        .default(Text("Camera"), action: {
-                            self.showImagePicker = true
-                            self.sourceType = .camera
-                        }),
-                        //Button2
-                        .default(Text("Photo Library"), action: {
-                            self.showImagePicker = true
-                            self.sourceType = .photoLibrary
-                        }),
-                        
-                        //Button3
-                        .cancel()
-                        
-                    ])
-                }.sheet(isPresented: $showImagePicker){
-                    ImagePicker(image: self.$restaurantImage, showImagePicker: self.$showImagePicker, sourceType: self.sourceType)
-                    
-            }
-                Spacer()
-            }
+            
         }
-        
+        HStack {
+            Spacer()
+            Button(action: {
+                self.showActionSheet = true
+            }) {
+                Text("Edit picture")
+                    .font(.subheadline)
+            }.actionSheet(isPresented: $showActionSheet){
+                ActionSheet(title: Text("Add a picture of the restaurant"), message: nil, buttons: [
+                    //Button1
+                    
+                    .default(Text("Camera"), action: {
+                        self.showImagePicker = true
+                        self.sourceType = .camera
+                    }),
+                    //Button2
+                    .default(Text("Photo Library"), action: {
+                        self.showImagePicker = true
+                        self.sourceType = .photoLibrary
+                    }),
+                    
+                    //Button3
+                    .cancel()
+                    
+                ])
+            }.sheet(isPresented: $showImagePicker){
+                ImagePicker(image: self.$restaurantImage, showImagePicker: self.$showImagePicker, sourceType: self.sourceType)
+                
+        }
+            Spacer()
+        }
         Form{
             Section{
                 VStack(alignment: .leading){
@@ -93,28 +107,29 @@ struct NewRestaurant: View {
                     
                                     VStack(alignment: .leading) {
                                         Text("NAME").font(.headline)
-                                        TextField("Enter restaurant name", text: $restaurantName)
+                                        TextField(restaurantPlaceholder,text: $restaurantName)
                                                     .padding(.all)
                                             .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0)).cornerRadius(10)
+                                        
                                         Text("TYPE").font(.headline)
-                                        TextField("Enter restaurant type", text: $restaurantType)
+                                        TextField(typePlaceholder, text: $restaurantType)
                                                     .padding(.all)
                                             .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0)).cornerRadius(10)
                 
                                         Text("ADDRESS").font(.headline)
-                                        TextField("Enter restaurant address", text: $restaurantAddress)
+                                        TextField(addressPlaceholder, text: $restaurantAddress)
                                                     .padding(.all)
                                             .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0)).cornerRadius(10)
                 
                                         Text("PHONE").font(.headline)
-                                        TextField("Enter restaurant phone", text: $restaurantPhone)
+                                        TextField(phonePlaceholder, text: $restaurantPhone)
                                                     .padding(.all)
                                             .keyboardType(.numberPad)
                                             .onReceive(Just(self.restaurantPhone), perform: self.numericValidator)
                                             .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0)).cornerRadius(10)
                 
                                         Text("DESCRIPTION").font(.headline)
-                                        TextField("Enter restaurant description", text: $description)
+                                        TextField(descriptionPlaceholder, text: $description)
                                                     .padding(.all)
                                             .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0)).cornerRadius(10)
                 
@@ -129,11 +144,11 @@ struct NewRestaurant: View {
                                                 isEmpty = true
                                                 return
                                             }
-                                            addRestaurant()
+                                            updateRestaurant(fetchedRest: fetchedRest)
                                             self.presentation.wrappedValue.dismiss()
                 
                                             }, label: {
-                                                Text("Save")
+                                                Text("Update")
                                                     .padding()
                                                     .background(Color.red)
                                                     .foregroundColor(Color.white).cornerRadius(16)
@@ -151,10 +166,10 @@ struct NewRestaurant: View {
             }.padding(.top,20)
             .padding(.bottom,10)
                                 .listRowInsets(EdgeInsets())
-                                .navigationTitle("New Restaurant")
+                                .navigationTitle("Edit Restaurant")
         }
         .background(Color.clear)
-            }
+    }
     func numericValidator(newValue: String) {
         if newValue.range(of: "^\\d+$", options: .regularExpression) != nil {
             self.restaurantPhone = newValue
@@ -162,21 +177,20 @@ struct NewRestaurant: View {
             self.restaurantPhone = String(newValue.prefix(self.restaurantPhone.count - 1))
         }
     }
-    
-    func addRestaurant(){
-        let newRestaurant = Restaurant(context: viewContext)
-        newRestaurant.id = UUID()
-        newRestaurant.name = restaurantName
-        newRestaurant.type = restaurantType
-        newRestaurant.address = restaurantAddress
-        newRestaurant.phone = restaurantPhone
-        newRestaurant.detail = description
-        newRestaurant.image = restaurantImage?.jpegData(compressionQuality: 1.0) ?? UIImage(named: "default")?.jpegData(compressionQuality: 1.0)
-        saveContext()
+    func updateRestaurant(fetchedRest: FetchedResults<Restaurant>.Element){
+        
+        withAnimation{
+            fetchedRest.id = restaurantID
+            fetchedRest.name = restaurantName
+            fetchedRest.type = restaurantType
+            fetchedRest.address = restaurantAddress
+            fetchedRest.phone = restaurantPhone
+            fetchedRest.detail = description
+            fetchedRest.image = restaurantImage?.jpegData(compressionQuality: 1.0) ?? UIImage(named: "default")?.jpegData(compressionQuality: 1.0)
+            saveContext()
+        }
+        
     }
-    
-   
-    
     private func saveContext(){
         do{
             try viewContext.save()
@@ -186,13 +200,11 @@ struct NewRestaurant: View {
             fatalError("Unresolved error: \(error)")
         }
     }
-  
 }
-            
 
-struct NewRestaurantView_Previews: PreviewProvider {
+struct SingleRestaurantView_Previews: PreviewProvider {
     static var previews: some View {
-        NewRestaurant()
+        let restu = Restaurant()
+        SingleRestaurantView(restObj: restu)
     }
 }
-

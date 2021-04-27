@@ -11,7 +11,7 @@ struct RestaurantList: View {
     @ObservedObject var restData = RestaurantDataStore.shared
     @State private var selectedItemId: UUID?
     @State private var searchText = ""
-    @State private var editMode = EditMode.inactive
+    @State private var refreshID = UUID()
     
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Restaurant.entity(), sortDescriptors: []) var restaurantList: FetchedResults<Restaurant>
@@ -29,16 +29,21 @@ struct RestaurantList: View {
                 ForEach(restaurantList
                             .filter({ if searchText.isEmpty{return true} else{ return $0.name!.contains(searchText) || $0.type!.contains(searchText) }}), id: \.id
                 ){restaurant in
+                    NavigationLink(destination: SingleRestaurantView(restObj: restaurant).environment(\.managedObjectContext, viewContext)
+                                    .onDisappear(perform: {
+                                        self.refreshID = UUID()
+                                    })
                     
+                    ){
                     CardView(rest: restaurant)
-                    
+                    }
                 }
                 .onDelete(perform: delete)
                     
-            }
-            .navigationBarItems(leading: EditButton(),trailing: addButton)
+            }.id(refreshID)
+            .navigationBarItems(trailing: addButton)
             .navigationTitle("Restaurants")
-            .environment(\.editMode, $editMode)
+            
             
         }
         
@@ -55,18 +60,14 @@ struct RestaurantList: View {
         }
         }
     private var addButton: some View {
-            switch editMode {
-            case .inactive:
+           
+           
                 return AnyView((NavigationLink(
                                 destination: NewRestaurant(restData: restData),
                                 label: {
                                     Label("Add", systemImage: "plus.app.fill")
                                 })))
-            default:
-                return AnyView(EmptyView())
-            }
-        }
-
+    }
     
 }
 
