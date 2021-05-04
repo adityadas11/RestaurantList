@@ -14,7 +14,7 @@ struct NewRestaurant: View {
     @ObservedObject var restData = RestaurantDataStore.shared
     @State private var isEmpty = false
     @Environment(\.managedObjectContext) private var viewContext
-    
+   
     
     @State var showActionSheet = false
     @State var showImagePicker = false
@@ -143,6 +143,7 @@ struct NewRestaurant: View {
                                         .alert(isPresented: $isEmpty, content: {
                                                 Alert(title: Text("Alert"), message: Text("Fields cannot be empty"), dismissButton: .cancel())
                                             })
+                                        
                                         Spacer()
                                     }
                 
@@ -156,12 +157,13 @@ struct NewRestaurant: View {
         .background(Color.clear)
             }
     func numericValidator(newValue: String) {
-        if newValue.range(of: "^\\d+$", options: .regularExpression) != nil {
+        if newValue.range(of: "^\\d+$", options: .regularExpression) != nil && newValue.count <= 10  {
             self.restaurantPhone = newValue
         } else if !self.restaurantPhone.isEmpty {
             self.restaurantPhone = String(newValue.prefix(self.restaurantPhone.count - 1))
         }
     }
+
     
     func addRestaurant(){
         let newRestaurant = Restaurant(context: viewContext)
